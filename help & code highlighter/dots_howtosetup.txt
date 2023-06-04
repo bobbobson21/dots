@@ -1,0 +1,12 @@
+I am a windown user not a linux one and I can not get linux cus my bios is crap so sorry but you may have to change enter.bat by a bit to run this with file support
+=======================================================================================================================================================================
+
+1  o download the exacuteable version of lua at http://luabinaries.sourceforge.net/download.html (has to be higher then lua 52)
+
+2  o extract the download to a folder of your choice
+
+3  o extract this to the same folder
+
+4  o create a file called dummy.dots and open it with enter.bat with tickbox checked
+
+5  o thats it

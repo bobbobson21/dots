@@ -1,0 +1,193 @@
+the numbers repasent where thay are on the exaucteion cycle
+========================================================================================================================================================================
+basics
+========================================================================================================================================================================
+
+0  o the '' operation is used to line comment
+
+0  o the .• operations is used to create dot entities before everything starts to run and it can also be used as path. if there is no path next to the dot entity when
+     it has been created the dot entity will will be destroyed before logic starts to run.
+
+3  o the # operation can be used to store stuff to a dots memory note like this: .-#nil#-#reset# oh and if you type nil it will delete the memory and reset will delete
+     memory stored in operations like [000] or ~ or }{ or /\ and the dot may also deleted depending on the operation to reset and how the operation was exacuted
+
+4  o the ? operation can be used to request a input from the user and this input will then be saved to the dots data
+	 
+1  o the $ can be use to print stuff to the console like this: .-?-$hello-world$--$hello world$--$I-hate #$ oh and # in a print command should print the dots 
+     data
+	 
+6  o the -|+.• operations can and are used as paths for the dot to move along however the line paths only support the direction thay go along
+
+7  o the <^v> operations are use the make the dot move in the direction thay point and thay work at all times with all incoming directions
+
+8  o the /\ operations reflect the dot like a laser pointing to a mirror at a 45 or 315 degrees angle
+
+17 o the & operation ends the program also the program will end if there are no more dot entities left
+
+?? o if your printing a string you can type ` to make sure the system reads the next letter along as non editable text only and with that you can do things like:
+     .->-$I-made-`$40$--v ''it will print "I made $40" oh and this will have abnormal effect of spaces vertically oh and the system wont read the ` part
+       ^----------------<
+
+
+========================================================================================================================================================================
+control flow
+========================================================================================================================================================================
+
+14 o if a dot enters a ~ from under it and that dot has some amount of data and that data dosent equal false then the next dot to come along after will move upwards
+
+15 o the : operation makes any dot that moves over it go up if that dot has data that dosent equal false if not the dot will continue onwards
+
+?? o the ! operation can be used to invert control flow requirments and can also be used with @ and with /\ to flip the direction of /\ oparations
+
+ 
+========================================================================================================================================================================
+the complcated stuff
+========================================================================================================================================================================
+
+9  o the * operation duplcates the dots for all directions that has a -| path and for directions that are not the same as the dot that exacuted the operation
+
+10  o the = operation will freeze all dots apart from the one that past over it and the dots will remain frozen untill the unfrozen dot passes over it again and btw
+      the $#() operations secretly call this
+	 
+12 o the }{ operations will frezze all dots that pass over one of these operations from the closed side but if a dot passes over from the open side all dots frozen by
+     gates will be unfrozen if allowed (dots can only be unfrozen one at a time so if two dots are at the same gate that gets opened only one will move but you
+     can open the gate agin for the other dot)
+
+11 o the ABCDEFGHIJKLMNOP operations can be used in conjuction with gates by puting it on the side of the dot approching the gate and with that you can make it so that
+     other gates that put it on that side of the incoming dots will be the only ones that open for example:
+     .--A}
+     .-A{--$gate A was opened$ ''gate A should be the only one that opens because of the A next to the gate on line one and two
+     .-B{--$gate B was opened$
+     .-C{--$gate C was opened$
+
+13 o The @ operation passes the dots data to dots frozen at gates if our dot then passes a gate from the open side and if the other dot were able to move past the gate.
+     you can also use a flow inverter to make it so that dots will only move pass the gate if thay have the same data as the dot that opened the gate like so:
+
+     .-#wow#-!@-}
+     .-#wow#-{--$gate wow was opened$
+     .-#bob#-{--$gate bob was opened$
+     .-#ght#-{--$gate ght was opened$
+
+16 o the 2345678 makes the dot jump that number of spaces along in the direction its going
+
+2  o the () operations are used to support a function like system that works like this:
+
+     .--(c main)-\   ''if the first letter in the brackets is c then it will register the x,y,direction of the dot (once it left the brackets) to memory under
+     /---#wow#---/   ''the text entered one space after c and after the dot will be destroyed
+     \-(r main)   ''r takes the dots data and puts it in memory then destroyes the dot
+.----(e main)      ''teleports the dot to the x,y posistion of the dot that created the function and sets direction to the dot that created the function as well
+
+               /-(g main)--$#$ ''gets the data put in memory and replaces the dots memory with it then prints it
+.-----(p main)-: ''probes to see if a function exists best used for stuff like "(p #)"
+.-----------(t main) ''t terminate the function so it can not be runned again and terminates any returned data
+
+.---(d `.`-`-$wow-it-a-dots-print-test$) ''puting d at the start will take everything one space after and import it into the program two lined down from the last line 
+.--(l print`( "wow it a lua print test"`)) '' puting l at the start will make everything one space after as exacute lua code and you and use ; for newlines in l or d
+.-(d C:\Users\bob\Desktop\printmore.dots) '' d can also be used to import the code from files
+''useing two ; togther like so ;; can also be used as an alternative for new lines in files and in the console
+
+========================================================================================================================================================================
+multi operation
+========================================================================================================================================================================
+
+5  o multi operation are done in brackets like this [*] or this [apl] and these and thay normally require two dots to work a list of all multi ops is below all
+     operations are done in the reverse the order dots go in for example(dot[2] /dot[1]) also dots can enter in any direction thay want but the returned dot will have
+	 the direction of the last dot to enter oh and only go through the middle if going vertically.
+
+5.1  o [*] muiltyplys
+
+5.2  o [/] divides
+
+5.3  o [+] add
+
+5.4  o [-] takeaway
+
+5.5  o [%] modulas
+
+5.6  o [^] power of
+
+5.7  o [&] and gate (gates only wook with bools)
+
+5.8  o [!] not gate (this one only needs one dot)
+
+5.9  o [o] or gate
+
+5.10 o [x] xor gate
+
+5.11 o [>] more than
+
+5.12 o [<] less than
+
+5.13 o [=] equals
+
+5.14 o [~] dosent equal
+
+5.15 o [=>=] equals or is more than
+
+5.16 o [=<=] equals or is less than
+
+5.17 o [apl] append start of tring
+
+5.18 o [apr] append end of string
+
+5.19 o [fir] find text right(find the right most posistion of some text in text like so: if dont one has 1 dot two has "I am gay but I don't like rainbows", dot two has
+       "gay", the returned dot will have "9")
+			 
+5.20 o [fil] find text left (like fir but it find it finds left most posistion which for the above example would be 6)
+
+5.21 o [rep] string replace (takes in three inputs like so: dot one is the replace text,dot two is the text you want to replace, dot three equals the string you want to
+             replace something in)
+
+5.22 o [sub] string sub (this also takes three inputs like so: dot one the right part of sub, dot two the left part of sub, dot three string you want to sub)
+
+5.23 o [ext] extract text ( if dot one has 3 and dot two has | and dot three has dots|have|magical|powers then the returned dot will have magical)
+
+5.24 o [rnd] random number (give it two dots with numbers and it will pick a random number between them)
+
+5.25 o [typ] type (takes a dot and returns what type of data it has as a string ie:number,string,boolean)
+
+5.26 o [ton] tostring (one dot)
+
+5.27 o [tos] tonumber (one dot)
+
+5.28 o [toc] to char (takes ascii number i think turns it to a letter)
+
+5.29 o [tob] to byte (takes a letter or the first letter in a sequance of letters and turns it into a number)
+
+5.30 o [upp] string upper (one dot)
+
+5.31 o [low] string lower (one dot)
+
+5.32 o [len] string length (one dot)
+
+5.33 o [rou] round (one dot)
+
+5.34 o [000] dot counter (replace the number inside brackets with a three digit number like 002 or 888 then the multi operation will count and then destroy the dots
+       that pass over it untill the count equals the number in the brackets at which point the count is insted reset and the last dot sent to satisfy the count
+	   will not be destroyed oh and cont has to be over 2 and lower than 888)
+
+	   
+========================================================================================================================================================================
+lua code you can use
+========================================================================================================================================================================
+
+   o onclose() --this is a function that runs when the program is at its end
+   
+   o operationout( dot, op, x, y ) --can be used to make fake oparations just return true
+   
+   o getuit() --returns the user input text by defult this would be "enter input:" (ONLY EXACUTE)
+   
+   o changeuit( text ) --changes the user input text (ONLY EXACUTE)
+   
+   o var( k, v ) --to create and get vars safely without worry you could break something and to get a var just make v = nil and use varnil to remove a var
+     but do not put brackets at the end of it
+	 
+   o getdotkv( k ) --gets key value data of the dot that ran the lua code data like: dir(direction), x, y and data(info put in the dot)
+   
+   o setdotkv( k, v ) --sets info in the dot
+
+   o removedot() --removes the current dot
+   
+   o getfiledirectory() --if dots was runned from a file you can use this to get the folder the file was in
+   
+   o getfilename() --if dots was runned from a file you can use this to get the files name

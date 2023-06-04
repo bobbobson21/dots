@@ -1,0 +1,3 @@
+@echo off
+echo compiling...
+start /b "" "%~dp0/lua54.exe" "%~dp0/dots.lua" %*

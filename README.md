@@ -1,0 +1,2 @@
+# dots
+ dot's or dots is a codeing language I kyle/Ilikecreepers/bobbobson21 made that is heavily inspiered by asciidots but I desinged it so that it be faster and more functional than the orignal asciidots however in order to do this I did have to sacrifice some elements of the orignal asciidots but I feel like what I added in place of thoese elements is far more better once you wrap you head around the working of stuff like [+] once again. 

@@ -1,0 +1,32 @@
+.--------(l changeuit`( "enter math symbol: "`))-(e main)
+
+.-(c main)-?-*-7      -*-*-*-------=-#reset#---------------------------------------------\
+             |         | | |                                                             |
+             |         2 4 6                                                             |
+             |                                                                           |
+             |         |          /--(l changeuit`( "enter number: "`))-(e add)          |
+             *-#+#----[=]---------:--------------------------------------------------\   |
+             |           |        /--(l changeuit`( "enter number: "`))-(e tak)      |   =
+             *-#`-#-----[=]-------:------------------------------------------------\ |   |
+             |             |      /--(l changeuit`( "enter number: "`))-(e mul)    >->-[004]------$Invaild-Input-Restarting-Main-Function$-(e main)
+        /-=--*-#*#--------[=]-----:------------------------------------------------/ |
+        |    |                    /--(l changeuit`( "enter number: "`))-(e div)      |
+        |    >-#/#-----------[=]--:--------------------------------------------------/
+        \-------------------=-/
+
+
+.--(c add)-*--?-4   -v
+           |       [ton]
+           >-?-[ton][+]--$#$--(l changeuit`( "enter math symbol: "`))-(e main)
+
+.---(c tak)-*--?-4   -v
+            |       [ton]
+            >-?-[ton][-]--$#$--(l changeuit`( "enter math symbol: "`))-(e main)
+		   
+.----(c mul)-*--?-4   -v
+             |       [ton]
+             >-?-[ton][*]--$#$--(l changeuit`( "enter math symbol: "`))-(e main)
+
+.-----(c div)-*--?-4   -v
+              |       [ton]
+              >-?-[ton][/]--$#$--(l changeuit`( "enter math symbol: "`))-(e main)
