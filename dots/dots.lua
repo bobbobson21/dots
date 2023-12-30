@@ -1,23 +1,23 @@
 	
 	local dots = {}
-	local exportedcode = {}
-	local operationdata = {}
-	local importedfile = {...}
-	varnil = "{[!£$%^&*dotsvarnil*&^%$£!]}"
+	local DotsCode = {}
+	local DotsCodeOparationData = {}
+	local ImportedFile = {...}
+	VarNil = "{[!£$%^&*dotsvarnil*&^%$£!]}"
 
-function onclose() end --to make something happpend when the program closes
-function operationout( dotid, op, x, y ) end --can be used for knowing the op exacuted
-function getuit( tex ) return "enter input: " end --gets user input text
-function changeuit( tex ) function getuit() return tex end end --can be used to give a reason for user input
-function getfiledirectory() return ( string.match( ( importedfile[1] or "" ), "^(.*[/\\])[^/\\]-$", 1 ) or "" ) end --get file dir
-function getfilename() return ( string.match( ( importedfile[1] or "" ), "[\\/]([^/\\]+)$", 1 ) or "" ) end --get file name
-function var( k, v ) --to make safe vars
-if v == nil then return operationdata["LUACODESAFEVAR_"..tostring( k )] end
-	operationdata["LUACODESAFEVAR_"..tostring( k )] = v
-if v == varnil then operationdata["LUACODESAFEVAR_"..tostring( k )] = nil end
+function OnClose() end --to make something happpend when the program closes
+function OparationOut( DotID, Oparation, X, Y ) end --can be used for knowing the op exacuted
+function GetUserInputText() return "enter Input: " end --gets user Input text
+function SetUserInputText( Tex ) function GetUserInputText() return Tex end end --can be used to give a reason for user Input
+function GetFileDirectory() return ( string.match( ( ImportedFile[1] or "" ), "^(.*[/\\])[^/\\]-$", 1 ) or "" ) end --get file dir
+function GetFileName() return ( string.match( ( ImportedFile[1] or "" ), "[\\/]([^/\\]+)$", 1 ) or "" ) end --get file name
+function Var( K, V ) --to make safe vars
+if V == nil then return DotsCodeOparationData["LUACODESAFEVAR_"..tostring( K )] end
+	DotsCodeOparationData["LUACODESAFEVAR_"..tostring( K )] = V
+if V == VarNil then DotsCodeOparationData["LUACODESAFEVAR_"..tostring( K )] = nil end
 end
 
-function cmdclear() --clears jargon from cmd window
+function CMDClear() --clears jargon from cmd window
 if os.getenv("USERPROFILE") ~= nil then
 os.execute( "cls" )
 else
@@ -29,843 +29,846 @@ os.execute( "reset" )
    end
 end
 
-function readff( filelocation, printcode ) --reads from a file
-	local file = io.open( filelocation, "r" )
-	local filedata = file:read( "*all" )..string.char( 10 )..""; file:close()
-	local lastpoint = 1
-	local inbrackets = false
+function ReadFromFile( FileDir, PrintCode ) --reads from a file
+	local File = io.open( FileDir, "r" )
+	local FileData = File:read( "*all" )..string.char( 10 )..""; File:close()
+	local EndOfLastLinePos = 1
 
-for z = 1, string.len( filedata ) do
-if string.sub( filedata, z, z ) == string.char( 10 ) or string.sub( filedata, z, z +1 ) == ";;" then
-	exportedcode[#exportedcode +1] = string.sub( filedata, lastpoint, z -1 )
-if printcode == true then print( string.sub( filedata, lastpoint, z -1 ) ) end
-	lastpoint = z +1
-if string.sub( filedata, z, z +1 ) == ";;" then lastpoint = lastpoint +1 end
+for Z = 1, string.len( FileData ) do
+if string.sub( FileData, Z, Z ) == string.char( 10 ) or string.sub( FileData, Z, Z +1 ) == ";;" then
+	DotsCode[#DotsCode +1] = string.sub( FileData, EndOfLastLinePos, Z -1 )
+if PrintCode == true then print( DotsCode[#DotsCode] ) end
+	EndOfLastLinePos = Z +1
+if string.sub( FileData, Z, Z +1 ) == ";;" then EndOfLastLinePos = EndOfLastLinePos +1 end
       end
    end
 end
 
-function readfi( indepentcount ) --reads from user input
-if indepentcount == nil then indepentcount = 1 end
-	local icountout = tostring( indepentcount ).."| "
+function ReadFromUserInput( UserCreatedNewLineCount ) --reads from user Input
+if UserCreatedNewLineCount == nil then UserCreatedNewLineCount = 1 end
+	local LineCountDisplayText = tostring( UserCreatedNewLineCount ).."| "
 
-if indepentcount <= 9 then icountout = "0"..icountout end
-if indepentcount <= 99 then icountout = "0"..icountout end
-io.write( icountout )
+if UserCreatedNewLineCount <= 9 then LineCountDisplayText = "0"..LineCountDisplayText end
+if UserCreatedNewLineCount <= 99 then LineCountDisplayText = "0"..LineCountDisplayText end
+io.write( LineCountDisplayText )
 
-	local input = io.read()..";;"
+	local Input = io.read()..";;"
 
-if input ~= "run;;" then
-	local lastpoint = 1
-for z = 1, string.len( input ) do
-if string.sub( input, z, z ) == string.char( 10 ) or string.sub( input, z, z +1 ) == ";;" then
-	exportedcode[#exportedcode +1] = string.sub( input, lastpoint, z -1 )
-	lastpoint = z +1
-if string.sub( input, z, z +1 ) == ";;" then lastpoint = lastpoint +1 end
+if Input ~= "run;;" then
+	local EndOfLastLinePos = 1
+for Z = 1, string.len( Input ) do
+if string.sub( Input, Z, Z ) == string.char( 10 ) or string.sub( Input, Z, Z +1 ) == ";;" then
+	DotsCode[#DotsCode +1] = string.sub( Input, EndOfLastLinePos, Z -1 )
+	EndOfLastLinePos = Z +1
+if string.sub( Input, Z, Z +1 ) == ";;" then EndOfLastLinePos = EndOfLastLinePos +1 end
    end
 end
 
-readfi( indepentcount +1 )
+ReadFromUserInput( UserCreatedNewLineCount +1 )
    end
 end
 
-function compileread( compilefrom, compileto ) --compiles the code that was read into the program
-	compilefrom = compilefrom or 1
-for z = compilefrom, ( compileto or #exportedcode ) do --makes comments work
-	local ejectpoint, nill = string.find( exportedcode[z], "''", 1, true )
-if ejectpoint ~= nil then
-	exportedcode[z] = string.sub( exportedcode[z], 1, ejectpoint -1 )
+function CompileRead( CompileFromLine, CompileUpToLine ) --compiles the code that was read into the program
+	CompileFromLine = CompileFromLine or 1
+for Z = CompileFromLine, ( CompileUpToLine or #DotsCode ) do --makes comments work
+	local LineHasComentPastThisPoint, Nil = string.find( DotsCode[Z], "''", 1, true )
+if LineHasComentPastThisPoint ~= nil then
+	DotsCode[Z] = string.sub( DotsCode[Z], 1, LineHasComentPastThisPoint -1 )
    end
 end
-for z = compilefrom, ( compileto or #exportedcode ) do --loads in dots also the forth unit of data is for storing stuff
-for y = 1, string.len( exportedcode[z] ) do
-if string.sub( exportedcode[z], y, y ) == "." or string.sub( exportedcode[z], y, y ) == "•" then
-	local addeddot = false
-if string.sub( exportedcode[z], y+1, y +1 ) == "-" and addeddot ~= true then dots[#dots +1], addeddot = {["x"]=y,["y"]=z,["dir"]="px",["data"]=nil}, true end --to right
-if string.sub( exportedcode[z +1] or "", y, y ) == "|" and addeddot ~= true then dots[#dots +1], addeddot = {["x"]=y,["y"]=z,["dir"]="py",["data"]=nil}, true end --down if line is on the line ahead on y
-if string.sub( exportedcode[z], y-1, y -1 ) == "-" and addeddot ~= true then dots[#dots +1], addeddot = {["x"]=y,["y"]=z,["dir"]="nx",["data"]=nil}, true end --to left
-if string.sub( exportedcode[z -1] or "", y, y ) == "|" and addeddot ~= true then dots[#dots +1], addeddot = {["x"]=y,["y"]=z,["dir"]="ny",["data"]=nil}, true end --up if line starts behind it on y
+
+for Z = CompileFromLine, ( CompileUpToLine or #DotsCode ) do --loads in dots also the forth unit of data is for storing stuff
+for Y = 1, string.len( DotsCode[Z] ) do
+if string.sub( DotsCode[Z], Y, Y ) == "." or string.sub( DotsCode[Z], Y, Y ) == "•" then
+	local HasDotEntBeenAdded = false
+if string.sub( DotsCode[Z], Y+1, Y +1 ) == "-" and HasDotEntBeenAdded ~= true then dots[#dots +1], HasDotEntBeenAdded = {["X"]=Y,["Y"]=Z,["Dir"]="px",["data"]=nil}, true end --to right
+if string.sub( DotsCode[Z +1] or "", Y, Y ) == "|" and HasDotEntBeenAdded ~= true then dots[#dots +1], HasDotEntBeenAdded = {["X"]=Y,["Y"]=Z,["Dir"]="py",["data"]=nil}, true end --down if line is on the line ahead on Y
+if string.sub( DotsCode[Z], Y-1, Y -1 ) == "-" and HasDotEntBeenAdded ~= true then dots[#dots +1], HasDotEntBeenAdded = {["X"]=Y,["Y"]=Z,["Dir"]="nx",["data"]=nil}, true end --to left
+if string.sub( DotsCode[Z -1] or "", Y, Y ) == "|" and HasDotEntBeenAdded ~= true then dots[#dots +1], HasDotEntBeenAdded = {["X"]=Y,["Y"]=Z,["Dir"]="ny",["data"]=nil}, true end --up if line starts behind it on y
          end
       end
    end
 end
 
-cmdclear()
+CMDClear()
 
-if importedfile[1] ~= nil then readff( importedfile[1], false ) else readfi() end --how program should open
+if ImportedFile[1] ~= nil then ReadFromFile( ImportedFile[1], false ) else ReadFromUserInput() end --how program should open
 
-cmdclear()
-compileread()
+CMDClear()
+CompileRead()
 math.randomseed( math.floor( os.time() /10000000 ) )
 ::mainloop:: --the main loop, the nexus of the dots wrold -----------------------------------------------------------------------------------------------------
-if dots[operationdata["OnlyRunThis"]] == nil then operationdata["OnlyRunThis"] = nil end --this prevents reading errors so dont delete it
+if dots[DotsCodeOparationData["OnlyRunThis"]] == nil then DotsCodeOparationData["OnlyRunThis"] = nil end --this prevents reading errors so dont delete it
 
-for k, v in pairs( dots ) do
-if operationdata["OnlyRunThis"] == nil or k == operationdata["OnlyRunThis"] then --this prevents reading errors so dont delete it
+for K, V in pairs( dots ) do
+if DotsCodeOparationData["OnlyRunThis"] == nil or K == DotsCodeOparationData["OnlyRunThis"] then --this prevents reading errors so dont delete it
 
-if v["dir"] == "px" then v["x"] = v["x"] +1 end
-if v["dir"] == "nx" then v["x"] = v["x"] -1 end
-if v["dir"] == "ny" then v["y"] = v["y"] -1 end
-if v["dir"] == "py" then v["y"] = v["y"] +1 end
+if V["Dir"] == "px" then V["X"] = V["X"] +1 end
+if V["Dir"] == "nx" then V["X"] = V["X"] -1 end
+if V["Dir"] == "ny" then V["Y"] = V["Y"] -1 end
+if V["Dir"] == "py" then V["Y"] = V["Y"] +1 end
 
-	local operation = string.sub( exportedcode[v["y"]] or "", v["x"], v["x"] )
-	local operationinvalid = true
+	local DotsCurrentOparation = string.sub( DotsCode[V["Y"]] or "", V["X"], V["X"] )
+	local IsOparationInvalid = true --will invalid untill the oparation proves its validness
 
-if ( v["y"] <= 0 or v["x"] <= 0 ) and v["blankdontkill"] ~= true then dots[k] = nil; operationinvalid = false end
-if dots[k] ~= nil and ( operation == "" or operation == " " ) and v["blankdontkill"] ~= true then dots[k] = nil; operationinvalid = false end
+if ( V["Y"] <= 0 or V["X"] <= 0 ) and V["BlankSpacesDontKill"] ~= true then dots[K] = nil; IsOparationInvalid = false end
+if dots[K] ~= nil and ( DotsCurrentOparation == "" or DotsCurrentOparation == " " ) and V["BlankSpacesDontKill"] ~= true then dots[K] = nil; IsOparationInvalid = false end
 
-if v["blankdontkill"] == true then
-if v["x"] <= 0 or v["x"] >= string.len( exportedcode[v["y"]] or "" ) +1 then print( "DOT["..tostring( k ).."] left the exportedcode space and could not be destroyed at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["y"] <= 0 or v["y"] >= #exportedcode +1 then print( "DOT["..tostring( k ).."] left the exportedcode space and could not be destroyed at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
+if V["BlankSpacesDontKill"] == true then
+if V["X"] <= 0 or V["X"] >= string.len( DotsCode[V["Y"]] or "" ) +1 then print( "DOT["..tostring( K ).."] left the codespace and could not be destroyed at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Y"] <= 0 or V["Y"] >= #DotsCode +1 then print( "DOT["..tostring( K ).."] left the codespace and could not be destroyed at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
 end
 
 -- the main important stuff to the codeing lang is bellow -----------------------------------------------------------------------------------------------------
 
-if operation == "`" and operationinvalid == true and dots[k] ~= nil then operationinvalid, v["DONTEDIT"] = false, true end
+if DotsCurrentOparation == "`" and IsOparationInvalid == true and dots[K] ~= nil then IsOparationInvalid, V["DONTEDIT"] = false, true end
 
-if operation == "$" and operationinvalid == true and dots[k] ~= nil and v["DONTEDIT"] ~= true and v["funcscan"] ~= true and v["writescan"] ~= true then if v["printscan"] == nil then v["blankdontkill"], v["printscan"] = true, true else v["blankdontkill"], v["printscan"] = nil, nil end; operationinvalid = false end
-if dots[k] ~= nil and v["printscan"] == true and operationinvalid == true then --print content
-	operationinvalid = false
-	local outop = operation
-if v["DONTEDIT"] ~= true then
-if operation == "#" then outop = v["data"] end
-if operation == "-" and string.sub( v["dir"], 2, 2 ) == "x" then outop = " " end
-if operation == "|" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
-if operation == "" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
+if DotsCurrentOparation == "$" and IsOparationInvalid == true and dots[K] ~= nil and V["DONTEDIT"] ~= true and V["FuncScan"] ~= true and V["WriteScan"] ~= true then if V["PrintScan"] == nil then V["BlankSpacesDontKill"], V["PrintScan"] = true, true else V["BlankSpacesDontKill"], V["PrintScan"] = nil, nil end; IsOparationInvalid = false end
+if dots[K] ~= nil and V["PrintScan"] == true and IsOparationInvalid == true then --print content
+	IsOparationInvalid = false
+	local TextReplace = DotsCurrentOparation
+if V["DONTEDIT"] ~= true then
+if DotsCurrentOparation == "#" then TextReplace = V["Data"] end
+if DotsCurrentOparation == "-" and string.sub( V["Dir"], 2, 2 ) == "x" then TextReplace = " " end
+if DotsCurrentOparation == "|" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
+if DotsCurrentOparation == "" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
 end
-if v["printtext"] == nil then v["printtext"] = "" end
-	v["printtext"] = v["printtext"]..tostring( outop )
+if V["PrintText"] == nil then V["PrintText"] = "" end
+	V["PrintText"] = V["PrintText"]..tostring( TextReplace )
 end
-if dots[k] ~= nil and v["printscan"] ~= true and v["printtext"] ~= nil then
-print( v["printtext"] )
-	v["printtext"], v["printscan"] = nil, nil
+if dots[K] ~= nil and V["PrintScan"] ~= true and V["PrintText"] ~= nil then
+print( V["PrintText"] )
+	V["PrintText"], V["PrintScan"] = nil, nil
 end
 
-if ( operation == "(" or operation == ")" ) and operationinvalid == true and dots[k] ~= nil and v["DONTEDIT"] ~= true and v["printscan"] ~= true and v["writescan"] ~= true then if v["funcscan"] == nil then v["blankdontkill"], v["funcscan"] = true, true else v["blankdontkill"], v["funcscan"] = nil, nil end; operationinvalid = false end
-if dots[k] ~= nil and v["funcscan"] ~= nil and v["funcscan"] == true and operationinvalid == true then --function content
-	operationinvalid = false
-	local outop = operation
-if v["DONTEDIT"] ~= true then
-if operation == "#" then outop = v["data"] end
-if operation == "-" and string.sub( v["dir"], 2, 2 ) == "x" then outop = " " end
-if operation == "|" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
-if operation == "" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
+if ( DotsCurrentOparation == "(" or DotsCurrentOparation == ")" ) and IsOparationInvalid == true and dots[K] ~= nil and V["DONTEDIT"] ~= true and V["PrintScan"] ~= true and V["WriteScan"] ~= true then if V["FuncScan"] == nil then V["BlankSpacesDontKill"], V["FuncScan"] = true, true else V["BlankSpacesDontKill"], V["FuncScan"] = nil, nil end; IsOparationInvalid = false end
+if dots[K] ~= nil and V["FuncScan"] ~= nil and V["FuncScan"] == true and IsOparationInvalid == true then --function content
+	IsOparationInvalid = false
+	local TextReplace = DotsCurrentOparation
+if V["DONTEDIT"] ~= true then
+if DotsCurrentOparation == "#" then TextReplace = V["Data"] end
+if DotsCurrentOparation == "-" and string.sub( V["Dir"], 2, 2 ) == "x" then TextReplace = " " end
+if DotsCurrentOparation == "|" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
+if DotsCurrentOparation == "" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
 end
-if v["functext"] == nil then v["functext"] = "" end
-	v["functext"] = v["functext"]..tostring( outop )
+if V["FuncText"] == nil then V["FuncText"] = "" end
+	V["FuncText"] = V["FuncText"]..tostring( TextReplace )
 end
-if dots[k] ~= nil and v["funcscan"] ~= true and v["functext"] ~= nil then
-if string.sub( v["functext"], 1, 1 ) == "c" then --create
-operationdata["FUNC_"..string.sub( v["functext"], 3, string.len( v["functext"] ) )] = {["x"]=v["x"],["y"]=v["y"],["dir"]=v["dir"],}
-	dots[k] = nil
+if dots[K] ~= nil and V["FuncScan"] ~= true and V["FuncText"] ~= nil then
+if string.sub( V["FuncText"], 1, 1 ) == "c" then --create
+DotsCodeOparationData["FUNC_"..string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )] = {["X"]=V["X"],["Y"]=V["Y"],["Dir"]=V["Dir"],}
+	dots[K] = nil
 end
-if string.sub( v["functext"], 1, 1 ) == "e" then --exacute
-	local func = operationdata["FUNC_"..string.sub( v["functext"], 3, string.len( v["functext"] ) )]
-if func ~= nil then
-	v["x"] = func["x"]
-	v["y"] = func["y"]
-	v["dir"] = func["dir"]
-	v["funcexacuted"] = string.sub( v["functext"], 3, string.len( v["functext"] ) )
+if string.sub( V["FuncText"], 1, 1 ) == "e" then --exacute
+	local Func = DotsCodeOparationData["FUNC_"..string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )]
+if Func ~= nil then
+	V["X"] = Func["X"]
+	V["Y"] = Func["Y"]
+	V["Dir"] = Func["Dir"]
+	V["TiedToFunction"] = string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )
 else
-print( "DOT["..tostring( k ).."] tried to exacute invalid function at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return
+print( "DOT["..tostring( K ).."] tried to exacute invalid function at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return
    end
 end
-if string.sub( v["functext"], 1, 1 ) == "r" then --return
-	local funcname = string.sub( v["functext"], 3, string.len( v["functext"] ) )
-if v["funcexacuted"] ~= funcname then print( "DOT["..tostring( k ).."] tried to return data for a function not associated with dot at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["FUNC_"..funcname] == nil then print( "DOT["..tostring( k ).."] tried to return for invalid function at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	operationdata["FUNC_RET_"..funcname] = v["data"]
-	dots[k] = nil
+if string.sub( V["FuncText"], 1, 1 ) == "r" then --return
+	local FuncName = string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )
+if V["TiedToFunction"] ~= FuncName then print( "DOT["..tostring( K ).."] tried to return data for a function not associated with dot at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["FUNC_"..FuncName] == nil then print( "DOT["..tostring( K ).."] tried to return for invalid function at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	DotsCodeOparationData["FUNC_RET_"..FuncName] = V["Data"]
+	dots[K] = nil
 end
-if string.sub( v["functext"], 1, 1 ) == "g" then --get
-if operationdata["FUNC_"..string.sub( v["functext"], 3, string.len( v["functext"] ) )] == nil then print( "DOT["..tostring( k ).."] tried to get from invalid function at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = operationdata["FUNC_RET_"..string.sub( v["functext"], 3, string.len( v["functext"] ) )]
+if string.sub( V["FuncText"], 1, 1 ) == "g" then --get
+if DotsCodeOparationData["FUNC_"..string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )] == nil then print( "DOT["..tostring( K ).."] tried to get from invalid function at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = DotsCodeOparationData["FUNC_RET_"..string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )]
 end
-if string.sub( v["functext"], 1, 1 ) == "p" then --probe
-	v["data"] = ( operationdata["FUNC_"..string.sub( v["functext"], 3, string.len( v["functext"] ) )] ~= nil )
+if string.sub( V["FuncText"], 1, 1 ) == "p" then --probe
+	V["Data"] = ( DotsCodeOparationData["FUNC_"..string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )] ~= nil )
 end
-if string.sub( v["functext"], 1, 1 ) == "t" then --terminate
-if operationdata["FUNC_"..funcname] == nil then print( "DOT["..tostring( k ).."] tried to terminate a invalid function at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	operationdata["FUNC_RET_"..funcname] = nil
-	operationdata["FUNC_"..funcname] = nil
+if string.sub( V["FuncText"], 1, 1 ) == "t" then --terminate
+if DotsCodeOparationData["FUNC_"..FuncName] == nil then print( "DOT["..tostring( K ).."] tried to terminate a invalid function at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	DotsCodeOparationData["FUNC_RET_"..FuncName] = nil
+	DotsCodeOparationData["FUNC_"..FuncName] = nil
 end
-if string.sub( v["functext"], 1, 1 ) == "l" then --lua
-	local f, e = load( string.sub( v["functext"], 3, string.len( v["functext"] ) ) )
-function getdotkv( l ) return v[l] end
-function setdotkv( l, w ) v[l] = w end
-function removedot() dots[k] = nil end
-	local returned = f()
-if returned ~= nil then v["data"] = returned end
+if string.sub( V["FuncText"], 1, 1 ) == "l" then --lua
+	local Run, Err = load( string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) ) )
+function GetDotKV( L ) return V[L] end
+function SetDotKV( L, W ) V[L] = W end
+function RemoveDot() dots[K] = nil end
+	local Returned = Run()
+if Returned ~= nil then V["Data"] = Returned end
 end
-if string.sub( v["functext"], 1, 1 ) == "d" then --dots
-	exportedcode[#exportedcode +1], exportedcode[#exportedcode +1] = "", "" --adds two empty lines into the program
-	local cof = string.sub( v["functext"], 3, string.len( v["functext"] ) )
-	local loadpoint = #exportedcode
-	local lastpoint = 1
-	local file = io.open( cof, "r" )
+if string.sub( V["FuncText"], 1, 1 ) == "d" then --dots
+	DotsCode[#DotsCode +1], DotsCode[#DotsCode +1] = "", "" --adds two empty lines into the program
+	local CodeOrFileOfCode = string.sub( V["FuncText"], 3, string.len( V["FuncText"] ) )
+	local loadpoint = #DotsCode
+	local EndOfLastLinePos = 1
+	local File = io.open( CodeOrFileOfCode, "r" )
 
-if file == nil then
-	cof = cof..";"
-for z = 1, string.len( cof ) do --reads our code into the program
-if string.sub( cof, z, z ) == string.char( 10 ) or string.sub( cof, z, z ) == ";" then
-	exportedcode[#exportedcode +1] = string.sub( cof, lastpoint, z -1 )
-	lastpoint = z +1
-   end
-end
-
-compileread( loadpoint ) --compiles new code
-else
-file:close()
-readff( cof ) --readff can only add not remove or edit and that makes this useful here
-compileread( loadpoint )
+if File == nil then
+	CodeOrFileOfCode = CodeOrFileOfCode..";"
+for Z = 1, string.len( CodeOrFileOfCode ) do --reads our code into the program
+if string.sub( CodeOrFileOfCode, Z, Z ) == string.char( 10 ) or string.sub( CodeOrFileOfCode, Z, Z ) == ";" then
+	DotsCode[#DotsCode +1] = string.sub( CodeOrFileOfCode, EndOfLastLinePos, Z -1 )
+	EndOfLastLinePos = Z +1
    end
 end
 
-if dots[k] ~= nil then
-	v["functext"], v["funcscan"] = nil, nil
+CompileRead( loadpoint ) --compiles new code
+else
+File:close()
+ReadFromFile( CodeOrFileOfCode ) --ReadFromFile can only add not remove or edit and that makes this useful here
+CompileRead( loadpoint )
    end
 end
 
-if operation == "#" and operationinvalid == true and dots[k] ~= nil and v["DONTEDIT"] ~= true and v["funcscan"] ~= true and v["printscan"] ~= true and v["comparescan"] ~= true then if v["writescan"] == nil then v["blankdontkill"], v["writescan"] = true, true else v["blankdontkill"], v["writescan"] = nil, nil end; operationinvalid = false end
-if dots[k] ~= nil and v["writescan"] == true and operationinvalid == true then --write to dot content
-	operationinvalid = false
-	local outop = operation
-if v["DONTEDIT"] ~= true then
-if operation == "-" and string.sub( v["dir"], 2, 2 ) == "x" then outop = " " end
-if operation == "|" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
-if operation == "" and string.sub( v["dir"], 2, 2 ) == "y" then outop = " " end
-end
-if v["writetext"] == nil then v["writetext"] = "" end
-	v["writetext"] = v["writetext"]..tostring( outop )
-end
-if dots[k] ~= nil and v["writescan"] ~= true and v["writetext"] ~= nil then
-	v["data"] = v["writetext"]
-if v["data"] == "nil" then v["data"] = nil end
-if v["data"] == "true" then v["data"] = true end
-if v["data"] == "false" then v["data"] = false end
-if tonumber( v["data"] ) ~= nil then v["data"] = tonumber( v["data"] ) end
-	v["writetext"] = nil
-	v["writescan"] = nil
-end
-if operation == "?" then
-	operationinvalid = false
-io.write( getuit() )
-v["data"] = io.read()
-if v["data"] == "nil" then v["data"] = nil end
-if v["data"] == "true" then v["data"] = true end
-if v["data"] == "false" then v["data"] = false end
-if tonumber( v["data"] ) ~= nil then v["data"] = tonumber( v["data"] ) end
-end
-
-if operationdata["OnlyRunThisOnManual"] ~= true and v["DONTEDIT"] ~= true then
-if operation == "$" and v["funcscan"] ~= true and v["writescan"] ~= true then
-if operationdata["OnlyRunThis"] == nil then operationdata["OnlyRunThis"] = k else operationdata["OnlyRunThis"] = nil end
-end
-if ( operation == "(" or operation == ")" ) and v["printscan"] ~= true and v["writescan"] ~= true then
-if operationdata["OnlyRunThis"] == nil then operationdata["OnlyRunThis"] = k else operationdata["OnlyRunThis"] = nil end
-end
-if operation == "#" and v["printscan"] ~= true and v["funcscan"] ~= true then
-if operationdata["OnlyRunThis"] == nil then operationdata["OnlyRunThis"] = k else operationdata["OnlyRunThis"] = nil end
+if dots[K] ~= nil then
+	V["FuncText"], V["FuncScan"] = nil, nil
    end
 end
 
-if operation ~= "`" and dots[k] ~= nil and v["DONTEDIT"] == true then v["DONTEDIT"] = nil end
+if DotsCurrentOparation == "#" and IsOparationInvalid == true and dots[K] ~= nil and V["DONTEDIT"] ~= true and V["FuncScan"] ~= true and V["PrintScan"] ~= true then if V["WriteScan"] == nil then V["BlankSpacesDontKill"], V["WriteScan"] = true, true else V["BlankSpacesDontKill"], V["WriteScan"] = nil, nil end; IsOparationInvalid = false end
+if dots[K] ~= nil and V["WriteScan"] == true and IsOparationInvalid == true then --write to dot content
+	IsOparationInvalid = false
+	local TextReplace = DotsCurrentOparation
+if V["DONTEDIT"] ~= true then
+if DotsCurrentOparation == "-" and string.sub( V["Dir"], 2, 2 ) == "x" then TextReplace = " " end
+if DotsCurrentOparation == "|" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
+if DotsCurrentOparation == "" and string.sub( V["Dir"], 2, 2 ) == "y" then TextReplace = " " end
+end
+if V["WriteText"] == nil then V["WriteText"] = "" end
+	V["WriteText"] = V["WriteText"]..tostring( TextReplace )
+end
+if dots[K] ~= nil and V["WriteScan"] ~= true and V["WriteText"] ~= nil then
+	V["Data"] = V["WriteText"]
+if V["Data"] == "nil" then V["Data"] = nil end
+if V["Data"] == "true" then V["Data"] = true end
+if V["Data"] == "false" then V["Data"] = false end
+if tonumber( V["Data"] ) ~= nil then V["Data"] = tonumber( V["Data"] ) end
+	V["WriteText"] = nil
+	V["WriteScan"] = nil
+end
+if DotsCurrentOparation == "?" then
+	IsOparationInvalid = false
+io.write( GetUserInputText() )
+V["Data"] = io.read()
+if V["Data"] == "nil" then V["Data"] = nil end
+if V["Data"] == "true" then V["Data"] = true end
+if V["Data"] == "false" then V["Data"] = false end
+if tonumber( V["Data"] ) ~= nil then V["Data"] = tonumber( V["Data"] ) end
+end
 
-	local inbracket = false
-if ( operation == "[" or string.sub( exportedcode[v["y"]] or "", v["x"] -1, v["x"] -1 ) == "[" or string.sub( exportedcode[v["y"]] or "", v["x"] -2, v["x"] -2 ) == "[" ) and operationinvalid == true and dots[k] ~= nil then operationinvalid, inbracket = false, true end
-if ( operation == "[" or string.sub( exportedcode[v["y"]] or "", v["x"] +1, v["x"] +1 ) == "]" or string.sub( exportedcode[v["y"]] or "", v["x"] +2, v["x"] +2 ) == "]" ) and operationinvalid == true and dots[k] ~= nil then operationinvalid = false end
-
-if operation == "]" and operationinvalid == true and dots[k] ~= nil then operationinvalid, inbracket = false, true end
-
-if ( operationinvalid == true or inbracket == true ) and dots[k] ~= nil then
-	local mopinvalid = true
-
-if string.sub( exportedcode[v["y"]] or "", v["x"] -1, v["x"] -1 ) == "[" and string.sub( exportedcode[v["y"]] or "", v["x"] +1, v["x"] +1 ) == "]" then
-if operationdata["OnlyRunThis"] == k then print( "DOT["..tostring( k ).."] exacuted a multi operation that can not be done with OnlyRunThis.dot running at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["data"] == "reset" then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )], dots[k] = nil, nil end
-
-if dots[k] ~= nil then
-if operation == "*" then --muiltyply
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] *v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil 
-   end
+if DotsCodeOparationData["OnlyRunThisOnManual"] ~= true and V["DONTEDIT"] ~= true then
+if DotsCurrentOparation == "$" and V["FuncScan"] ~= true and V["WriteScan"] ~= true then
+if DotsCodeOparationData["OnlyRunThis"] == nil then DotsCodeOparationData["OnlyRunThis"] = K else DotsCodeOparationData["OnlyRunThis"] = nil end
 end
-if operation == "/" then --divide
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] /v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
+if ( DotsCurrentOparation == "(" or DotsCurrentOparation == ")" ) and V["PrintScan"] ~= true and V["WriteScan"] ~= true then
+if DotsCodeOparationData["OnlyRunThis"] == nil then DotsCodeOparationData["OnlyRunThis"] = K else DotsCodeOparationData["OnlyRunThis"] = nil end
 end
-if operation == "+" then --add
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] =  operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "-" then --takeaway
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] -v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "%" then --modules/ persent math
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] %v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "^" then --num ^num
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ^v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "&" then --and gate
-	mopinvalid = false
-if type( v["data"] ) ~= "boolean" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == true ) and ( v["data"] == true ) )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "!" then --not gate
-	mopinvalid = false
-if type( v["data"] ) ~= "boolean" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = ( v["data"] == false )
-end
-if operation == "o" then --or gate
-	mopinvalid = false
-if type( v["data"] ) ~= "boolean" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == true ) or ( v["data"] == true ) )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "x" then --xor gate
-	mopinvalid = false
-if type( v["data"] ) ~= "boolean" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = (  ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == true ) or ( v["data"] == true ) )
-if ( ( v["data"] == true ) and ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == true ) ) then v["data"] = false end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == ">" then --more than
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] > v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "<" then --less than
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] < v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "=" then --equals
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
-   end
-end
-if operation == "~" then --not equals
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+if DotsCurrentOparation == "#" and V["PrintScan"] ~= true and V["FuncScan"] ~= true then
+if DotsCodeOparationData["OnlyRunThis"] == nil then DotsCodeOparationData["OnlyRunThis"] = K else DotsCodeOparationData["OnlyRunThis"] = nil end
    end
 end
 
-if mopinvalid == true then print( "DOT["..tostring( k ).."] tried to exacute a invalid multi operation at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
+if DotsCurrentOparation ~= "`" and dots[K] ~= nil and V["DONTEDIT"] == true then V["DONTEDIT"] = nil end
+
+	local InBracket = false
+if ( DotsCurrentOparation == "[" or string.sub( DotsCode[V["Y"]] or "", V["X"] -1, V["X"] -1 ) == "[" or string.sub( DotsCode[V["Y"]] or "", V["X"] -2, V["X"] -2 ) == "[" ) and IsOparationInvalid == true and dots[K] ~= nil then IsOparationInvalid, InBracket = false, true end
+if ( DotsCurrentOparation == "[" or string.sub( DotsCode[V["Y"]] or "", V["X"] +1, V["X"] +1 ) == "]" or string.sub( DotsCode[V["Y"]] or "", V["X"] +2, V["X"] +2 ) == "]" ) and IsOparationInvalid == true and dots[K] ~= nil then IsOparationInvalid = false end
+
+if DotsCurrentOparation == "]" and IsOparationInvalid == true and dots[K] ~= nil then IsOparationInvalid, InBracket = false, true end
+
+if ( IsOparationInvalid == true or InBracket == true ) and dots[K] ~= nil then
+	local IsMuiltyOparationInvalid = true
+
+if string.sub( DotsCode[V["Y"]] or "", V["X"] -1, V["X"] -1 ) == "[" and string.sub( DotsCode[V["Y"]] or "", V["X"] +1, V["X"] +1 ) == "]" then
+if DotsCodeOparationData["OnlyRunThis"] == K then print( "DOT["..tostring( K ).."] exacuted a multi oparation that can not be done with OnlyRunThis.dot running at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Data"] == "reset" then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )], dots[K] = nil, nil end
+
+if dots[K] ~= nil then
+if DotsCurrentOparation == "*" then --muiltyply
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] *V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil 
+   end
+end
+if DotsCurrentOparation == "/" then --divide
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] /V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "+" then --add
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] =  DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "-" then --takeaway
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] -V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "%" then --modules/ persent math
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] %V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "^" then --num ^num
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ^V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "&" then --and gate
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "boolean" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true ) and ( V["Data"] == true ) )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "!" then --not gate
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "boolean" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = ( V["Data"] == false )
+end
+if DotsCurrentOparation == "o" then --or gate
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "boolean" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true ) or ( V["Data"] == true ) )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "x" then --xor gate
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "boolean" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = (  ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true ) or ( V["Data"] == true ) )
+if ( ( V["Data"] == true ) and ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true ) ) then V["Data"] = false end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == ">" then --more than
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] > V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "<" then --less than
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] < V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "=" then --equals
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+if DotsCurrentOparation == "~" then --not equals
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+else
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
+   end
+end
+
+if IsMuiltyOparationInvalid == true then print( "DOT["..tostring( K ).."] tried to exacute a invalid multi oparation at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
    end
 end
  
-if string.sub( exportedcode[v["y"]] or "", v["x"] -2, v["x"] -2 ) == "[" and string.sub( exportedcode[v["y"]] or "", v["x"] +2, v["x"] +2 ) == "]" then
-	local newop = string.sub( exportedcode[v["y"]] or "", v["x"] -1, v["x"] +1 )
+if string.sub( DotsCode[V["Y"]] or "", V["X"] -2, V["X"] -2 ) == "[" and string.sub( DotsCode[V["Y"]] or "", V["X"] +2, V["X"] +2 ) == "]" then
+	local newop = string.sub( DotsCode[V["Y"]] or "", V["X"] -1, V["X"] +1 )
 
-if operationdata["OnlyRunThis"] == k then print( "DOT["..tostring( k ).."] exacuted a multi operation that can not be done with OnlyRunThis.dot running at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["data"] == "reset" then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )], dots[k] = nil, nil end
+if DotsCodeOparationData["OnlyRunThis"] == K then print( "DOT["..tostring( K ).."] exacuted a multi oparation that can not be done with OnlyRunThis.dot running at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Data"] == "reset" then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )], dots[K] = nil, nil end
 
-if dots[k] ~= nil then
+if dots[K] ~= nil then
 if newop == "=>=" then --more than
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
    end
 end
 if newop == "=<=" then --less than
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = ( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] <= v["data"] )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = ( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] <= V["Data"] )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
    end
 end
 if newop == "apl" then --append left
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] =  v["data"]..operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] =  V["data"]..DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
    end
 end
 if newop == "apr" then --append right
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )]..v["data"]
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )]..V["Data"]
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
    end
 end
 if newop == "fir" then --find right
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = {} end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][#operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1] = v["data"]
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == 1 and type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 2 and type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 3 then
-	local mstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][3]
-	local fstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][2]
-	local posx = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][1]
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = {} end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][#DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1] = V["Data"]
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == 1 and type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 2 and type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 3 then
+	local MasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][3]
+	local FindInMasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local StartSearchingFrom = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][1]
 
-	local strs, stre = string.find( mstring, fstring, posx, true )
-	v["data"] = stre
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	local StringLeft, StringRight = string.find( MasterString, FindInMasterString, StartSearchingFrom, true )
+	V["Data"] = StringRight
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 
 if newop == "fil" then --find right
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = {} end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][#operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1] = v["data"]
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == 1 and type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 2 and type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 3 then
-	local mstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][3]
-	local fstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][2]
-	local posx = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][1]
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = {} end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][#DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1] = V["Data"]
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == 1 and type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 2 and type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 3 then
+	local MasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][3]
+	local FindInMasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local StartSearchingFrom = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][1]
 
-	local strs, stre = string.find( mstring, fstring, posx, true )
-	v["data"] = strs
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	local StringLeft, StringRight = string.find( MasterString, FindInMasterString, StartSearchingFrom, true )
+	V["Data"] = StringLeft
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 if newop == "rep" then --string replace
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = {} end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][#operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1] = v["data"]
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 3 then
-	local mstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][3]
-	local tofind = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][2]
-	local torelink = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][1]
-
-for z = 1, string.len( mstring ) do
-	local strs, stre = string.find( mstring, tofind, z, false )
-if strs ~= nil and stre ~= nil then
-	mstring = string.sub( mstring, 1, strs -1 )..torelink..string.sub( mstring, stre +1, string.len( mstring ) )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = {} end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][#DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1] = V["Data"]
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 3 then
+	local MasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][3]
+	local FindInMasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local ReplaceFindWithString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][1]
+	local StringLeft, StringRight = string.find( MasterString, tofind, Z, false )
+	local StartSearchingFrom = 1
+	
+while (StringLeft ~= nil and StringRight ~= nil) do
+	StringLeft, StringRight = string.find( MasterString, tofind, Z, false )
+if StringLeft ~= nil and StringRight ~= nil then
+	MasterString = string.sub( MasterString, 1, StringLeft -1 )..ReplaceFindWithString..string.sub( MasterString, StringRight +1, string.len( MasterString ) )
+	StartSearchingFrom = StringRight
    end
 end
 
-	v["data"] = mstring
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	V["Data"] = MasterString
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 if newop == "sub" then --string sub
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = {} end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][#operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1] = v["data"]
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == 3 and type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] <= 2 and type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 3 then
-	local mstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][3]
-	local l = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][2]
-	local r = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][1]
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = {} end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][#DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1] = V["Data"]
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == 3 and type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] <= 2 and type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 3 then
+	local MasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][3]
+	local LeftCut = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local RightCut = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][1]
 
-	v["data"] = string.sub( mstring, l, r )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	V["Data"] = string.sub( MasterString, LeftCut, RightCut )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 if newop == "ext" then --extract
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = {} end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][#operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1] = v["data"]
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == 1 and type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 2 and type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if #operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= 3 then
-	local mstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][3]
-	local fstring = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][2]
-	local wordx = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )][1]
-	local lastpoint = 1
-	local breakcount = 0
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = {} end
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][#DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1] = V["Data"]
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == 1 and type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 2 and type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if #DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= 3 then
+	local MasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][3]..DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local FindInMasterString = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][2]
+	local StopExtractionAfter = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )][1]
+	local EndOfLastLinePos = 1
+	local CurrentExtractonPoint = 0
 	
-for z = 1, string.len( mstring ) do
-if string.sub( mstring, z, z+ ( string.len( fstring ) -1 ) ) == fstring and breakcount <= wordx then
-	v["data"] = string.sub( mstring, lastpoint, z -1 )
-	breakcount = breakcount +1
-	lastpoint = z +string.len( fstring )
+for Z = 1, string.len( MasterString ) do
+if string.sub( MasterString, Z, Z+ ( string.len( FindInMasterString ) -1 ) ) == FindInMasterString and CurrentExtractonPoint <= StopExtractionAfter then
+	V["Data"] = string.sub( MasterString, EndOfLastLinePos, Z -1 )
+	CurrentExtractonPoint = CurrentExtractonPoint +1
+	EndOfLastLinePos = Z +string.len( FindInMasterString )
    end 
 end
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 if newop == "rnd" then --random
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= nil then 
-	v["data"] = math.random( math.min( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )], v["data"] ), math.max( operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )], v["data"] ) )
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= nil then 
+	V["Data"] = math.random( math.min( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )], V["Data"] ), math.max( DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )], V["Data"] ) )
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	 operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = v["data"]
-	 dots[k] = nil
+	 DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = V["Data"]
+	 dots[K] = nil
    end
 end
 if newop == "typ" then --type
-	mopinvalid = false
-	v["data"] = type( v["data"] )
+	IsMuiltyOparationInvalid = false
+	V["Data"] = type( V["Data"] )
 end
 if newop == "ton" then --tonumber
-	mopinvalid = false
-	v["data"] = tonumber( v["data"] ) or 0
+	IsMuiltyOparationInvalid = false
+	V["Data"] = tonumber( V["Data"] ) or 0
 end
 if newop == "tos" then --tostring
-	mopinvalid = false
-	v["data"] = tostring( v["data"] ) or ""
+	IsMuiltyOparationInvalid = false
+	V["Data"] = tostring( V["Data"] ) or ""
 end
 if newop == "toc" then --to char
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = string.char( v["data"] )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = string.char( V["Data"] )
 end
 if newop == "tob" then --to byte
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = string.byte( v["data"], 1, 1 )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = string.byte( V["data"], 1, 1 )
 end
 if newop == "upp" then --upper
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = string.upper( v["data"] )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = string.upper( V["Data"] )
 end
 if newop == "low" then --lower
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = string.lower( v["data"] )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = string.lower( V["Data"] )
 end
 if newop == "len" then --lower
-	mopinvalid = false
-if type( v["data"] ) ~= "string" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = string.len( v["data"] )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "string" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = string.len( V["Data"] )
 end
 if newop == "rou" then --round
-	mopinvalid = false
-if type( v["data"] ) ~= "number" then print( "DOT["..tostring( k ).."] pass a type of data on to a multi operation that can not accept that type of data at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	v["data"] = math.floor( v["data"] +0.50 )
+	IsMuiltyOparationInvalid = false
+if type( V["Data"] ) ~= "number" then print( "DOT["..tostring( K ).."] pass a type of data on to a multi oparation that can not accept that type of data at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	V["Data"] = math.floor( V["Data"] +0.50 )
 end
 	local fillpower = tonumber( newop ) or 0
-if fillpower >= 2 and fillpower <= 888 then --count operation
-	mopinvalid = false
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] == nil then operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = 0 end
-operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] +1
-if operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] >= fillpower then 
-	operationdata["[]_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
+if fillpower >= 2 and fillpower <= 888 then --count DotsCurrentOparation
+	IsMuiltyOparationInvalid = false
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] == nil then DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = 0 end
+DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] +1
+if DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] >= fillpower then 
+	DotsCodeOparationData["[]_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
 else
-	dots[k] = nil
+	dots[K] = nil
    end
 end
 
-if mopinvalid == true then print( "DOT["..tostring( k ).."] tried to exacute a invalid multi operation at "..tostring( v["x"] )..", "..tostring( v["y"] ) ) end
+if IsMuiltyOparationInvalid == true then print( "DOT["..tostring( K ).."] tried to exacute a invalid multi oparation at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ) end
       end
    end
 end
 
-if ( operation == "-" or operation == "|" or operation == "+" or operation == "." or operation == "•" ) and operationinvalid == true and dots[k] ~= nil then --path content
-	operationinvalid = false
-if dots[k] ~= nil and ( v["dir"] == "px" or v["dir"] == "nx" ) and operation == "|" then print( "DOT["..tostring( k ).."] crashed in to other track at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if dots[k] ~= nil and ( v["dir"] == "py" or v["dir"] == "ny" ) and operation == "-" then print( "DOT["..tostring( k ).."] crashed in to other track at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
+if ( DotsCurrentOparation == "-" or DotsCurrentOparation == "|" or DotsCurrentOparation == "+" or DotsCurrentOparation == "." or DotsCurrentOparation == "•" ) and IsOparationInvalid == true and dots[K] ~= nil then --path content
+	IsOparationInvalid = false
+if dots[K] ~= nil and ( V["Dir"] == "px" or V["Dir"] == "nx" ) and DotsCurrentOparation == "|" then print( "DOT["..tostring( K ).."] crashed in to other track at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if dots[K] ~= nil and ( V["Dir"] == "py" or V["Dir"] == "ny" ) and DotsCurrentOparation == "-" then print( "DOT["..tostring( K ).."] crashed in to other track at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
 end
 
-if operation == ">" and operationinvalid == true and dots[k] ~= nil then v["dir"] = "px"; operationinvalid = false end --movement content
-if operation == "<" and operationinvalid == true and dots[k] ~= nil then v["dir"] = "nx"; operationinvalid = false end
-if operation == "^" and operationinvalid == true and dots[k] ~= nil then v["dir"] = "ny"; operationinvalid = false end
-if operation == "v" and operationinvalid == true and dots[k] ~= nil then v["dir"] = "py"; operationinvalid = false end
+if DotsCurrentOparation == ">" and IsOparationInvalid == true and dots[K] ~= nil then V["Dir"] = "px"; IsOparationInvalid = false end --movement content
+if DotsCurrentOparation == "<" and IsOparationInvalid == true and dots[K] ~= nil then V["Dir"] = "nx"; IsOparationInvalid = false end
+if DotsCurrentOparation == "^" and IsOparationInvalid == true and dots[K] ~= nil then V["Dir"] = "ny"; IsOparationInvalid = false end
+if DotsCurrentOparation == "V" and IsOparationInvalid == true and dots[K] ~= nil then V["Dir"] = "py"; IsOparationInvalid = false end
 
-if ( operation == "/" or operation == string.char( 92 ) ) and dots[k] ~= nil then
-if v["data"] == "reset" then operationdata["//_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil end
-if v["invertflow"] == true and dots[k] ~= nil then
-if operationdata["//_"..tostring( v["x"] )..","..tostring( v["y"] )] ~= true then operationdata["//_"..tostring( v["x"] )..","..tostring( v["y"] )] = true else operationdata["//_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil end
-	v["invertflow"] = nil
+if ( DotsCurrentOparation == "/" or DotsCurrentOparation == string.char( 92 ) ) and dots[K] ~= nil then
+if V["Data"] == "reset" then DotsCodeOparationData["//_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil end
+if V["invertflow"] == true and dots[K] ~= nil then
+if DotsCodeOparationData["//_"..tostring( V["X"] )..","..tostring( V["Y"] )] ~= true then DotsCodeOparationData["//_"..tostring( V["X"] )..","..tostring( V["Y"] )] = true else DotsCodeOparationData["//_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil end
+	V["invertflow"] = nil
 end
-if operationdata["//_"..tostring( v["x"] )..","..tostring( v["y"] )] == true and dots[k] ~= nil then
-if operation == "/" then operation = string.char( 92 ) else operation = "/" end
+if DotsCodeOparationData["//_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true and dots[K] ~= nil then
+if DotsCurrentOparation == "/" then DotsCurrentOparation = string.char( 92 ) else DotsCurrentOparation = "/" end
    end
 end
 
-if operation == "/" and operationinvalid == true and dots[k] ~= nil then --angled reflectors
-if v["dir"] == "px" and operationinvalid ~= false then v["dir"], operationinvalid = "ny", false end
-if v["dir"] == "nx" and operationinvalid ~= false then v["dir"], operationinvalid = "py", false end
-if v["dir"] == "py" and operationinvalid ~= false then v["dir"], operationinvalid = "nx", false end
-if v["dir"] == "ny" and operationinvalid ~= false then v["dir"], operationinvalid = "px", false end
+if DotsCurrentOparation == "/" and IsOparationInvalid == true and dots[K] ~= nil then --angled reflectors
+if V["Dir"] == "px" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "ny", false end
+if V["Dir"] == "nx" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "py", false end
+if V["Dir"] == "py" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "nx", false end
+if V["Dir"] == "ny" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "px", false end
 end
 
-if operation == string.char( 92 ) and operationinvalid == true and dots[k] ~= nil then --angled reflectors
-if v["dir"] == "px" and operationinvalid ~= false then v["dir"], operationinvalid = "py", false end
-if v["dir"] == "nx" and operationinvalid ~= false then v["dir"], operationinvalid = "ny", false end
-if v["dir"] == "py" and operationinvalid ~= false then v["dir"], operationinvalid = "px", false end
-if v["dir"] == "ny" and operationinvalid ~= false then v["dir"], operationinvalid = "nx", false end
+if DotsCurrentOparation == string.char( 92 ) and IsOparationInvalid == true and dots[K] ~= nil then --angled reflectors
+if V["Dir"] == "px" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "py", false end
+if V["Dir"] == "nx" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "ny", false end
+if V["Dir"] == "py" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "px", false end
+if V["Dir"] == "ny" and IsOparationInvalid ~= false then V["Dir"], IsOparationInvalid = "nx", false end
 end
 
-if operation == "*" and operationinvalid == true and dots[k] ~= nil then --dotdupe content
-if operationdata["OnlyRunThis"] == k then print( "DOT["..tostring( k ).."] exacuted an operation that should not be exacuted with OnlyRunThis.dot running at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-	operationinvalid = false
-	local d = string.sub( v["dir"], 2, 2 )
+if DotsCurrentOparation == "*" and IsOparationInvalid == true and dots[K] ~= nil then --dotdupe content
+if DotsCodeOparationData["OnlyRunThis"] == K then print( "DOT["..tostring( K ).."] exacuted an oparation that should not be exacuted with OnlyRunThis.dot running at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+	IsOparationInvalid = false
+	local d = string.sub( V["Dir"], 2, 2 )
 	local exspandabletbla, exspandabletblb = {}, {}
-for l, w in pairs( v ) do exspandabletbla[l], exspandabletblb[l] = w, w end
+for L, W in pairs( V ) do exspandabletbla[L], exspandabletblb[L] = W, W end
 
-if string.sub( exportedcode[v["y"]] or "", v["x"] +1, v["x"] +1 ) == "-" and d == "y" then
-	exspandabletbla["dir"] = "px"
+if string.sub( DotsCode[V["Y"]] or "", V["X"] +1, V["X"] +1 ) == "-" and d == "y" then
+	exspandabletbla["Dir"] = "px"
 	dots[#dots +1] = exspandabletbla
 end
-if string.sub( exportedcode[v["y"]] or "", v["x"] -1, v["x"] -1 ) == "-" and d == "y" then
-	exspandabletblb["dir"] = "nx"
+if string.sub( DotsCode[V["Y"]] or "", V["X"] -1, V["X"] -1 ) == "-" and d == "y" then
+	exspandabletblb["Dir"] = "nx"
 	dots[#dots +1] = exspandabletblb
 end
-if string.sub( exportedcode[v["y"] +1] or "", v["x"], v["x"] ) == "|" and d == "x" then
-	exspandabletbla["dir"] = "py"
+if string.sub( DotsCode[V["Y"] +1] or "", V["X"], V["X"] ) == "|" and d == "x" then
+	exspandabletbla["Dir"] = "py"
 	dots[#dots +1] = exspandabletbla
 end
-if string.sub( exportedcode[v["y"] -1] or "", v["x"], v["x"] ) == "|" and d == "x" then
-	exspandabletblb["dir"] = "ny"
+if string.sub( DotsCode[V["Y"] -1] or "", V["X"], V["X"] ) == "|" and d == "x" then
+	exspandabletblb["Dir"] = "ny"
 	dots[#dots +1] = exspandabletblb
 end
-if v["dir"] == "px" and string.sub( exportedcode[v["y"]] or "", v["x"] +1, v["x"] +1 ) ~= "-" then dots[k] = nil end
-if v["dir"] == "nx" and string.sub( exportedcode[v["y"]] or "", v["x"] -1, v["x"] -1 ) ~= "-" then dots[k] = nil end
-if v["dir"] == "py" and string.sub( exportedcode[v["y"] +1] or "", v["x"], v["x"] ) ~= "|" then dots[k] = nil end
-if v["dir"] == "ny" and string.sub( exportedcode[v["y"] -1] or "", v["x"], v["x"] ) ~= "|" then dots[k] = nil end
+if V["Dir"] == "px" and string.sub( DotsCode[V["Y"]] or "", V["X"] +1, V["X"] +1 ) ~= "-" then dots[K] = nil end
+if V["Dir"] == "nx" and string.sub( DotsCode[V["Y"]] or "", V["X"] -1, V["X"] -1 ) ~= "-" then dots[K] = nil end
+if V["Dir"] == "py" and string.sub( DotsCode[V["Y"] +1] or "", V["X"], V["X"] ) ~= "|" then dots[K] = nil end
+if V["Dir"] == "ny" and string.sub( DotsCode[V["Y"] -1] or "", V["X"], V["X"] ) ~= "|" then dots[K] = nil end
 end
-if operation == "=" and operationinvalid == true and dots[k] ~= nil then --only make one dot move and all other dots freeze
-	operationinvalid = false
-if operationdata["OnlyRunThis"] == nil then operationdata["OnlyRunThis"] = k else operationdata["OnlyRunThis"] = nil end
-if operationdata["OnlyRunThisOnManual"] == nil then operationdata["OnlyRunThisOnManual"] = true else operationdata["OnlyRunThisOnManual"] = nil end
+if DotsCurrentOparation == "=" and IsOparationInvalid == true and dots[K] ~= nil then --only make one dot move and all other dots freeze
+	IsOparationInvalid = false
+if DotsCodeOparationData["OnlyRunThis"] == nil then DotsCodeOparationData["OnlyRunThis"] = K else DotsCodeOparationData["OnlyRunThis"] = nil end
+if DotsCodeOparationData["OnlyRunThisOnManual"] == nil then DotsCodeOparationData["OnlyRunThisOnManual"] = true else DotsCodeOparationData["OnlyRunThisOnManual"] = nil end
 end
 
-if operation == "A" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "A", false end --bracket gate key content
-if operation == "B" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "B", false end
-if operation == "C" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "C", false end
-if operation == "D" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "D", false end
-if operation == "E" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "E", false end
-if operation == "F" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "F", false end
-if operation == "G" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "G", false end
-if operation == "H" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "H", false end
-if operation == "I" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "I", false end
-if operation == "J" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "J", false end
-if operation == "K" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "K", false end
-if operation == "L" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "L", false end
-if operation == "M" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "M", false end
-if operation == "N" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "N", false end
-if operation == "O" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "O", false end
-if operation == "P" and operationinvalid == true and dots[k] ~= nil then v["gatekey"], operationinvalid = "P", false end
+if DotsCurrentOparation == "A" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "A", false end --bracket gate key content
+if DotsCurrentOparation == "B" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "B", false end
+if DotsCurrentOparation == "C" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "C", false end
+if DotsCurrentOparation == "D" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "D", false end
+if DotsCurrentOparation == "E" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "E", false end
+if DotsCurrentOparation == "F" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "F", false end
+if DotsCurrentOparation == "G" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "G", false end
+if DotsCurrentOparation == "H" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "H", false end
+if DotsCurrentOparation == "I" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "I", false end
+if DotsCurrentOparation == "J" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "J", false end
+if DotsCurrentOparation == "K" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "K", false end
+if DotsCurrentOparation == "L" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "L", false end
+if DotsCurrentOparation == "M" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "M", false end
+if DotsCurrentOparation == "N" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "N", false end
+if DotsCurrentOparation == "O" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "O", false end
+if DotsCurrentOparation == "P" and IsOparationInvalid == true and dots[K] ~= nil then V["gatekey"], IsOparationInvalid = "P", false end
 
-if operation == "@" and operationinvalid == true and dots[k] ~= nil then --send the dots data through the bracket gate to other dots
-	v["gatedata"], operationinvalid = true, false
-if v["invertflow"] == true then v["gatedata"], v["invertflow"] = "INVERTED", nil end
+if DotsCurrentOparation == "@" and IsOparationInvalid == true and dots[K] ~= nil then --send the dots data through the bracket gate to other dots
+	V["GateData"], IsOparationInvalid = true, false
+if V["invertflow"] == true then V["GateData"], V["invertflow"] = "INVERTED", nil end
 end
-if operation == "}" and operationinvalid == true and dots[k] ~= nil then --bracket gate content
-	operationinvalid = false
+if DotsCurrentOparation == "}" and IsOparationInvalid == true and dots[K] ~= nil then --bracket gate content
+	IsOparationInvalid = false
 
-if v["data"] == "reset" then v["gatekey"], v["gatedata"], v["data"] = nil, nil, nil end
-if operationdata["OnlyRunThis"] == k then print( "DOT["..tostring( k ).."] exacuted an operation that should not be exacuted with OnlyRunThis.dot running at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["dir"] == "py" or v["dir"] == "ny" then print( "DOT["..tostring( k ).."] tried to exacute operation incorrectly at"..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["dir"] == "nx" then v["dir"], v["gate"] = "na", "}" end
-if v["dir"] == "px" then
-for l, w in pairs( dots ) do
-if operationdata["{}_"..tostring( w["x"] )..","..tostring( w["y"] )] ~= true then
-if v["gatedata"] ~= "INVERTED" or v["data"] == w["data"] then
-if w["gate"] == "{" and v["gatekey"] == w["gatekey"] and w ~= v then w["dir"] = "px" end
-if w["gate"] == "}" and v["gatekey"] == w["gatekey"] and w ~= v then w["dir"] = "nx" end
-if v["gatekey"] == w["gatekey"] and w ~= v then
-if v["gatedata"] == true then w["data"] = v["data"] end
-	operationdata["{}_"..tostring( w["x"] )..","..tostring( w["y"] )] = true
-	w["gatekey"], w["gatedata"], w["gate"] = nil, nil
+if V["Data"] == "reset" then V["gatekey"], V["GateData"], V["Data"] = nil, nil, nil end
+if DotsCodeOparationData["OnlyRunThis"] == K then print( "DOT["..tostring( K ).."] exacuted an oparation that should not be exacuted with OnlyRunThis.dot running at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Dir"] == "py" or V["Dir"] == "ny" then print( "DOT["..tostring( K ).."] tried to exacute oparation incorrectly at"..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Dir"] == "nx" then V["Dir"], V["Gate"] = "na", "}" end
+if V["Dir"] == "px" then
+for L, W in pairs( dots ) do
+if DotsCodeOparationData["{}_"..tostring( W["X"] )..","..tostring( W["Y"] )] ~= true then
+if V["GateData"] ~= "INVERTED" or V["Data"] == W["Data"] then
+if W["Gate"] == "{" and V["GateKey"] == W["GateKey"] and W ~= V then W["Dir"] = "px" end
+if W["Gate"] == "}" and V["GateKey"] == W["GateKey"] and W ~= V then W["Dir"] = "nx" end
+if V["GateKey"] == W["GateKey"] and W ~= V then
+if V["GateData"] == true then W["Data"] = V["Data"] end
+	DotsCodeOparationData["{}_"..tostring( W["X"] )..","..tostring( W["Y"] )] = true
+	W["gatekey"], W["GateData"], W["Gate"] = nil, nil
 	     end
 	  end
    end
 end
-	v["gatekey"], v["gatedata"] = nil, nil
+	V["gatekey"], V["GateData"] = nil, nil
    end
 end
-if operation == "{" and operationinvalid == true and dots[k] ~= nil then
-	operationinvalid = false
+if DotsCurrentOparation == "{" and IsOparationInvalid == true and dots[K] ~= nil then
+	IsOparationInvalid = false
 
-if v["data"] == "reset" then v["gatekey"], v["gatedata"], v["data"] = nil, nil, nil end
-if operationdata["OnlyRunThis"] == k then print( "DOT["..tostring( k ).."] exacuted an operation that can not be done with OnlyRunThis.dot running at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["dir"] == "py" or v["dir"] == "ny" then print( "DOT["..tostring( k ).."] tried to exacute operation incorrectly at"..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if v["dir"] == "px" then v["dir"], v["gate"] = "na", "{" end
-if v["dir"] == "nx" then
-for l, w in pairs( dots ) do
-if operationdata["{}_"..tostring( w["x"] )..","..tostring( w["y"] )] ~= true then
-if v["gatedata"] ~= "INVERTED" or w["data"] == v["data"] then
-if w["gate"] == "{" and v["gatekey"] == w["gatekey"] and w ~= v then w["dir"] = "px" end
-if w["gate"] == "}" and v["gatekey"] == w["gatekey"] and w ~= v then w["dir"] = "nx" end
-if v["gatekey"] == w["gatekey"] and w ~= v then
-if v["gatedata"] == true then w["data"] = v["data"] end
-	operationdata["{}_"..tostring( w["x"] )..","..tostring( w["y"] )] = true
-	w["gatekey"], w["gatedata"], w["gate"] = nil, nil
+if V["Data"] == "reset" then V["gatekey"], V["GateData"], V["Data"] = nil, nil, nil end
+if DotsCodeOparationData["OnlyRunThis"] == K then print( "DOT["..tostring( K ).."] exacuted an oparation that can not be done with OnlyRunThis.dot running at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Dir"] == "py" or V["Dir"] == "ny" then print( "DOT["..tostring( K ).."] tried to exacute oparation incorrectly at"..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if V["Dir"] == "px" then V["Dir"], V["Gate"] = "na", "{" end
+if V["Dir"] == "nx" then
+for L, W in pairs( dots ) do
+if DotsCodeOparationData["{}_"..tostring( W["X"] )..","..tostring( W["Y"] )] ~= true then
+if V["GateData"] ~= "INVERTED" or W["Data"] == V["Data"] then
+if W["Gate"] == "{" and V["GateKey"] == W["GateKey"] and W ~= V then W["Dir"] = "px" end
+if W["Gate"] == "}" and V["GateKey"] == W["GateKey"] and W ~= V then W["Dir"] = "nx" end
+if V["GateKey"] == W["GateKey"] and W ~= V then
+if V["GateData"] == true then W["Data"] = V["Data"] end
+	DotsCodeOparationData["{}_"..tostring( W["X"] )..","..tostring( W["Y"] )] = true
+	W["gatekey"], W["GateData"], W["Gate"] = nil, nil
 	     end
 	  end
    end
 end
-	v["gatekey"], v["gatedata"] = nil, nil
+	V["gatekey"], V["GateData"] = nil, nil
    end
 end
 
-if operation == "~" and operationinvalid == true and dots[k] ~= nil then
-	operationinvalid = false
+if DotsCurrentOparation == "~" and IsOparationInvalid == true and dots[K] ~= nil then
+	IsOparationInvalid = false
 
-if v["dir"] == "ny" then
-if v["data"] ~= nil and v["data"] ~= false then
-	operationdata["cf_"..tostring( v["x"] )..","..tostring( v["y"] )] = true
+if V["Dir"] == "ny" then
+if V["Data"] ~= nil and V["Data"] ~= false then
+	DotsCodeOparationData["cf_"..tostring( V["X"] )..","..tostring( V["Y"] )] = true
 end
-if v["invertflow"] == true and ( v["data"] == nil or v["data"] == false ) then
-	operationdata["cf_"..tostring( v["x"] )..","..tostring( v["y"] )] = true
+if V["invertflow"] == true and ( V["Data"] == nil or V["Data"] == false ) then
+	DotsCodeOparationData["cf_"..tostring( V["X"] )..","..tostring( V["Y"] )] = true
 end
-	dots[k] = nil
+	dots[K] = nil
 end
-if operationdata["cf_"..tostring( v["x"] )..","..tostring( v["y"] )] == true and dots[k] ~= nil then
-	operationdata["cf_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil
-	v["dir"] = "ny"
+if DotsCodeOparationData["cf_"..tostring( V["X"] )..","..tostring( V["Y"] )] == true and dots[K] ~= nil then
+	DotsCodeOparationData["cf_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil
+	V["Dir"] = "ny"
 end
-if v["data"] == "reset" then operationdata["cf_"..tostring( v["x"] )..","..tostring( v["y"] )] = nil end
-end
-
-if operation == ":" and operationinvalid == true and dots[k] ~= nil then
-	operationinvalid = false
-if v["data"] ~= nil and v["data"] ~= false then
-	v["dir"] = "ny"
-end
-if v["invertflow"] == true and ( v["data"] == nil or v["data"] == false ) then
-	v["dir"] = "ny"
-end
-	v["invertflow"] = nil
+if V["Data"] == "reset" then DotsCodeOparationData["cf_"..tostring( V["X"] )..","..tostring( V["Y"] )] = nil end
 end
 
-	local jumpower = tonumber( operation ) or 0 --allows dots to jump spaces
-if jumpower >= 2 and jumpower <= 8 and operationinvalid == true and dots[k] ~= nil then
-	operationinvalid = false
-if v["dir"] == "px" then v["x"] = v["x"] +( jumpower -1 ) end
-if v["dir"] == "nx" then v["x"] = v["x"] -( jumpower -1 ) end
-if v["dir"] == "py" then v["y"] = v["y"] +( jumpower -1 ) end
-if v["dir"] == "ny" then v["y"] = v["y"] -( jumpower -1 ) end
+if DotsCurrentOparation == ":" and IsOparationInvalid == true and dots[K] ~= nil then
+	IsOparationInvalid = false
+if V["Data"] ~= nil and V["Data"] ~= false then
+	V["Dir"] = "ny"
+end
+if V["invertflow"] == true and ( V["Data"] == nil or V["Data"] == false ) then
+	V["Dir"] = "ny"
+end
+	V["invertflow"] = nil
 end
 
-if operation == "&" and operationinvalid == true and dots[k] ~= nil then
-	operationinvalid = false
-for l, w in pairs( dots ) do dots[l] = nil end
+	local jumpower = tonumber( DotsCurrentOparation ) or 0 --allows dots to jump spaces
+if jumpower >= 2 and jumpower <= 8 and IsOparationInvalid == true and dots[K] ~= nil then
+	IsOparationInvalid = false
+if V["Dir"] == "px" then V["X"] = V["X"] +( jumpower -1 ) end
+if V["Dir"] == "nx" then V["X"] = V["X"] -( jumpower -1 ) end
+if V["Dir"] == "py" then V["Y"] = V["Y"] +( jumpower -1 ) end
+if V["Dir"] == "ny" then V["Y"] = V["Y"] -( jumpower -1 ) end
 end
 
-if operation ~= "!" and dots[k] ~= nil and v["invertflow"] == true then print( "DOT["..tostring( k ).."] exacuted a flow inverter operation without a invertable operation infont of dot at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
-if operation == "!" and operationinvalid == true and dots[k] ~= nil then v["invertflow"], operationinvalid = true, false end
+if DotsCurrentOparation == "&" and IsOparationInvalid == true and dots[K] ~= nil then
+	IsOparationInvalid = false
+for L, W in pairs( dots ) do dots[L] = nil end
+end
 
-	local approveinvalidation = false
-if inbracket ~= true and v["printscan"] ~= true and v["writescan"] ~= true and v["funcscan"] ~= true then approveinvalidation = operationout( v, operation, v["x"], v["y"] ) end
-if inbracket == true then  approveinvalidation = operationout( k, "[]", v["x"], v["y"] ) end
-if v["printscan"] == true then approveinvalidation = operationout( k, "$", v["x"], v["y"] ) end
-if v["writescan"] == true then approveinvalidation = operationout( k, "#", v["x"], v["y"] ) end
-if v["funcscan"] == true then approveinvalidation = operationout( k, "()", v["x"], v["y"] ) end
+if DotsCurrentOparation ~= "!" and dots[K] ~= nil and V["invertflow"] == true then print( "DOT["..tostring( K ).."] exacuted a flow inverter oparation without a invertable oparation infont of dot at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
+if DotsCurrentOparation == "!" and IsOparationInvalid == true and dots[K] ~= nil then V["invertflow"], IsOparationInvalid = true, false end
 
-if approveinvalidation == true then operationinvalid = false end
-if operationinvalid == true and dots[k] ~= nil then print( "DOT["..tostring( k ).."] tried to exacute a invalid operation at "..tostring( v["x"] )..", "..tostring( v["y"] ) ); return end
+	local OpparationBeingInvalidIsFine = false
+if InBracket ~= true and V["PrintScan"] ~= true and V["WriteScan"] ~= true and V["FuncScan"] ~= true then OpparationBeingInvalidIsFine = OparationOut( V, DotsCurrentOparation, V["X"], V["Y"] ) end
+if InBracket == true then  OpparationBeingInvalidIsFine = OparationOut( K, "[]", V["X"], V["Y"] ) end
+if V["PrintScan"] == true then OpparationBeingInvalidIsFine = OparationOut( K, "$", V["X"], V["Y"] ) end
+if V["WriteScan"] == true then OpparationBeingInvalidIsFine = OparationOut( K, "#", V["X"], V["Y"] ) end
+if V["FuncScan"] == true then OpparationBeingInvalidIsFine = OparationOut( K, "()", V["X"], V["Y"] ) end
+
+if OpparationBeingInvalidIsFine == true then IsOparationInvalid = false end
+if IsOparationInvalid == true and dots[K] ~= nil then print( "DOT["..tostring( K ).."] tried to exacute a invalid oparation at "..tostring( V["X"] )..", "..tostring( V["Y"] ) ); return end
 
    end
 end
 
-	local gatecode = "{}_" --stops gates from breaking due to clogage
-for k, v in pairs( operationdata ) do
-if string.sub( k, 1, string.len( gatecode ) ) == gatecode then
-	operationdata[k] = nil
+	local GateCode = "{}_" --stops gates from breaking due to clogage
+for K, V in pairs( DotsCodeOparationData ) do
+if string.sub( K, 1, string.len( GateCode ) ) == GateCode then
+	DotsCodeOparationData[K] = nil
    end
 end
 
-if next( dots ) ~= nil then goto mainloop else onclose() end
+if next( dots ) ~= nil then goto mainloop else OnClose() end
 
